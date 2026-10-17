@@ -40,12 +40,12 @@ I kept it small on purpose. I'd rather build something I fully understand than s
 
 ## 📸 Screenshots
 
-Draw screen -  World (day) 
+
 Draw screen <img width="1917" height="906" alt="image" src="https://github.com/user-attachments/assets/d8b5191b-8ee4-4a1a-ab64-e1ffb75a5b8b" />
 World (day) <img width="1917" height="903" alt="image" src="https://github.com/user-attachments/assets/850b971f-434b-4383-b831-0d8b6caa83fe" />
  
 
-Hearts when doodles meet - World (night) 
+
 Hearts when doodles meet <img width="1917" height="903" alt="image" src="https://github.com/user-attachments/assets/9ea9e3ce-cf95-4a0c-b2ba-16576665e3d5" />
 World (night) <img width="1917" height="908" alt="image" src="https://github.com/user-attachments/assets/223781a2-03e2-4d22-a74d-bea873440b7c" />
  
