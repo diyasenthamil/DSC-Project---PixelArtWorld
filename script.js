@@ -164,6 +164,21 @@ function switchTab(tabName) {
     // Close any previous selection card
     doodleCard.classList.add("hidden");
     selectedDoodleId = null;
+
+    // Sync empty state message: hide if doodles exist, show if 0 doodles
+    if (worldEmptyState) {
+      if (doodles.length > 0) {
+        worldEmptyState.classList.add("hidden");
+      } else {
+        worldEmptyState.classList.remove("hidden");
+      }
+    }
+
+    // Immediately draw background scenery
+    drawWorldBackground();
+
+    // Ensure the 60fps animation loop is active
+    ensureWorldAnimationLoop();
   }
 }
 
@@ -636,6 +651,8 @@ function renderPaletteSwatches() {
  * and saves everything persistently to localStorage.
  */
 function addDoodleToWorld() {
+  console.log("✨ [Add to World] Clicked 'Add to World' button");
+
   // First, verify that the user drew something (not completely transparent)
   let pixelCount = 0;
   for (let y = 0; y < gridSize; y++) {
@@ -653,14 +670,17 @@ function addDoodleToWorld() {
 
   // Ask for a cute doodle name with prompt()
   const defaultName = "Doodle " + (doodles.length + 1);
-  const enteredName = prompt("Name your cute creation:", defaultName);
-
-  // If user clicked Cancel on the prompt, stop here
-  if (enteredName === null) {
-    return;
+  let doodleName = defaultName;
+  try {
+    const enteredName = prompt("Name your cute creation:", defaultName);
+    // If user provided a name, use it; otherwise safely keep defaultName
+    if (enteredName && enteredName.trim().length > 0) {
+      doodleName = enteredName.trim();
+    }
+  } catch (err) {
+    // Fallback if browser blocks prompt
+    doodleName = defaultName;
   }
-
-  const doodleName = enteredName.trim() || defaultName;
 
   // Make a clean deep copy of the grid data
   const savedGrid = cloneGrid(gridData);
@@ -688,6 +708,7 @@ function addDoodleToWorld() {
 
   // Add the doodle to our living doodles list
   doodles.push(newDoodle);
+  console.log("✨ [Add to World] Doodle pushed to array:", doodleName, "Total in world:", doodles.length);
 
   // Save to localStorage so it persists across page reloads!
   saveDoodlesToLocalStorage();
@@ -697,13 +718,19 @@ function addDoodleToWorld() {
     worldCountBadge.textContent = doodles.length;
   }
 
+  // Cute pulse animation on the World tab so the user knows where their doodle went!
+  tabWorldBtn.classList.add("tab-pulse");
+  setTimeout(function () {
+    tabWorldBtn.classList.remove("tab-pulse");
+  }, 1200);
+
   // Hide the empty state message overlay in the World screen
   if (worldEmptyState) {
     worldEmptyState.classList.add("hidden");
   }
 
-  // Show a celebratory toast message
-  showToast(doodleName + " joined the world! ✨");
+  // Show a celebratory toast message inviting the user to see their creation
+  showToast(doodleName + " entered the world! Click 'World' to see it ✨");
 
   // Clear the drawing grid so the user can draw their next creation
   clearGrid(true); // isSilent = true
@@ -775,15 +802,12 @@ function drawPixelFlower(x, y, petalColor) {
 function drawPixelMoon(x, y) {
   const s = 4;
   worldCtx.fillStyle = "#ffeaa7"; // Warm moonlight yellow
+  // Intrinsic pixel crescent curve - no dark cutout box required!
   worldCtx.fillRect(x + 2 * s, y, 3 * s, 2 * s);
-  worldCtx.fillRect(x + 1 * s, y + 2 * s, 4 * s, 2 * s);
-  worldCtx.fillRect(x, y + 4 * s, 4 * s, 3 * s);
-  worldCtx.fillRect(x + 1 * s, y + 7 * s, 4 * s, 2 * s);
+  worldCtx.fillRect(x + 1 * s, y + 2 * s, 2 * s, 2 * s);
+  worldCtx.fillRect(x, y + 4 * s, 2 * s, 3 * s);
+  worldCtx.fillRect(x + 1 * s, y + 7 * s, 2 * s, 2 * s);
   worldCtx.fillRect(x + 2 * s, y + 9 * s, 3 * s, 2 * s);
-
-  // Cutout with dark sky color to create the crescent curve
-  worldCtx.fillStyle = "#0c1445";
-  worldCtx.fillRect(x + 3 * s, y + 2 * s, 3 * s, 7 * s);
 }
 
 /**
@@ -1068,6 +1092,19 @@ function updateAndDrawDoodles() {
   }
 }
 
+// Tracks whether the 60fps animation loop has been initiated
+let isWorldAnimationRunning = false;
+
+/**
+ * Ensures the world animation loop is started only once.
+ */
+function ensureWorldAnimationLoop() {
+  if (!isWorldAnimationRunning) {
+    isWorldAnimationRunning = true;
+    requestAnimationFrame(worldAnimationLoop);
+  }
+}
+
 /**
  * Main World Animation Loop!
  * requestAnimationFrame is the standard, high-performance way to animate in web browsers:
@@ -1076,21 +1113,25 @@ function updateAndDrawDoodles() {
  * - It automatically pauses when the user switches tabs, saving computer CPU and battery!
  */
 function worldAnimationLoop() {
-  // Only render the active world when on the World tab (saves resources)
-  if (activeTab === "world") {
-    // 1. Draw the scenery (sky, grass, clouds, stars)
-    drawWorldBackground();
+  try {
+    // Only render the active world when on the World tab (saves resources)
+    if (activeTab === "world") {
+      // 1. Draw the scenery (sky, grass, clouds, stars)
+      drawWorldBackground();
 
-    // 2. Move and draw all doodles
-    if (doodles.length > 0) {
-      updateAndDrawDoodles();
-      checkCoexistence();
-      updateAndDrawHearts();
+      // 2. Move and draw all doodles
+      if (doodles.length > 0) {
+        updateAndDrawDoodles();
+        checkCoexistence();
+        updateAndDrawHearts();
+      }
     }
-  }
 
-  // Increment star twinkling time
-  starTime++;
+    // Increment star twinkling time
+    starTime++;
+  } catch (loopError) {
+    console.error("Error in worldAnimationLoop:", loopError);
+  }
 
   // Request the next animation frame from the browser
   requestAnimationFrame(worldAnimationLoop);
@@ -1101,16 +1142,36 @@ function worldAnimationLoop() {
  */
 function toggleDayNight() {
   isNightMode = !isNightMode;
+  console.log("🌙 [Night Mode] Toggled night mode. isNightMode is now:", isNightMode);
+
+  // Toggle night styling on the stage container and the night mode button
+  const worldStage = document.querySelector(".world-stage-container");
+  if (worldStage) {
+    worldStage.classList.toggle("night", isNightMode);
+  }
+  if (dayNightBtn) {
+    dayNightBtn.classList.toggle("night-active", isNightMode);
+  }
 
   if (isNightMode) {
     dayNightBtn.textContent = "☀️ Day Mode";
-    worldStatusText.textContent = "The night sky is peaceful";
+    worldStatusText.textContent = "The night sky is peaceful 🌙";
     showToast("Night fell upon Tiny World... 🌙");
   } else {
     dayNightBtn.textContent = "🌙 Night Mode";
-    worldStatusText.textContent = "Your world is peaceful";
+    worldStatusText.textContent = "Your world is peaceful ☀️";
     showToast("The morning sun is shining! ☀️");
   }
+
+  // Save night mode choice to localStorage
+  try {
+    localStorage.setItem("tiny_world_night_mode", isNightMode ? "true" : "false");
+  } catch (storageError) {
+    // Ignore storage issues
+  }
+
+  // Immediately draw background so sky change is visible instantly
+  drawWorldBackground();
 }
 
 /**
@@ -1252,6 +1313,16 @@ function loadDoodlesFromLocalStorage() {
   // If doodles exist, hide the empty state card
   if (doodles.length > 0 && worldEmptyState) {
     worldEmptyState.classList.add("hidden");
+  }
+
+  // Load saved Night Mode preference
+  try {
+    const savedNight = localStorage.getItem("tiny_world_night_mode");
+    if (savedNight === "true" && !isNightMode) {
+      toggleDayNight();
+    }
+  } catch (storageError) {
+    // Ignore storage issues
   }
 }
 
@@ -1454,7 +1525,7 @@ function initApp() {
   showToast("Welcome to Tiny World! 🎨");
 
   // Start the 60fps world animation loop!
-  requestAnimationFrame(worldAnimationLoop);
+  ensureWorldAnimationLoop();
 }
 
 // Start the app!
