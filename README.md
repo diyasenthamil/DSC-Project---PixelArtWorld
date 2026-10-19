@@ -3,7 +3,7 @@
 
 > A little pixel world where the doodles you draw come to life, wander around, and make friends.
 
-**🔗 Live demo:**  https://diyasenthamil.github.io/DSC-Project---PixelArtWorld/
+**🔗 Live demo:**  https://diyasenthamil.github.com/DSC-Project---PixelArtWorld/
 
 
 Tiny World – World screen 
