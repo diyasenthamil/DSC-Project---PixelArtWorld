@@ -1,4 +1,4 @@
-# DSC-Project---PixelArtWorld
+# Project---PixelArtWorld
 # 🌍 Tiny World
 
 > A little pixel world where the doodles you draw come to life, wander around, and make friends.
@@ -12,7 +12,7 @@ Tiny World – World screen
 
 ## 👋 About this project
 
-Hi, I'm Diya, a first-year BTech CSBS student at Sathyabama University. I'm also a self-taught traditional and digital artist, so when I had to pick something to build for the Google Student Developers Club, I wanted it to combine the two things I love: drawing and coding.
+Hi, I'm Diya, a first-year BTech CSBS student at Sathyabama University. I'm also a self-taught traditional and digital artist, so when I had a long weekend worth of time, I wanted it to combine the two things I love: drawing and coding.
 
 Tiny World started from a simple thought: *what if my tiny doodles didn't just sit on a page, but actually lived somewhere?* So I built an app where you draw a little character on a pixel grid, add it to a world, and watch it wander around the grass, bob along, and pop a heart when it meets another doodle.
 
@@ -140,6 +140,6 @@ That's it. Nothing to install.
 
 ## 💌 Thank you
 
-Thanks to the Google Student Developers Club for the chance to build something creative, and to everyone who looked at my doodles and said "aww."
+Thanks to everyone who looked at my doodles and said "aww."
 
 **Made by Diya** 🎨💻
